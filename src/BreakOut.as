@@ -38,49 +38,45 @@ package {
 			
 			//stage.addEventListener(KeyboardEvent.KEY_UP, upKeyboard);
 	
-			function animate(e:Event):void 
-			{
-				//checks to see when the end comes
-				if (brickM.getBrickCount() == 0)
-				{
+			function animate(e:Event):void{
+				//checks when Brick Manager Contains 0 Bricks
+				if (brickM.getBrickCount() == 0){
+					//Reset Bricks
 					start = false;
 					power.setLevel(power.getLevel()+1);
 					ball.resetBall();
-					brickM.creatBricks();
-					
-					
+					brickM.creatBricks();	
 				}
 				
-				//checks to see if u loose a life
-				if (ball.getY() >= 480)
-				{
+				//checks to see if ball goes under paddle
+				if (ball.getY() >= 480){
+					//Stop and reset Ball
 					start = false;
 					liveNum -= 1;
 					Lives.text = liveNum.toString();
 					
 					ball.resetBall();
-					
 				}
 				
 				//lives == 0 restart game
-				if (liveNum == 0)
-				{
+				if (liveNum == 0){
+				
+					//remove Brick (Big Mistake... why use a for loop?)
+					for (var m:Number = 0; m <= brickM.getBrickCount(); ++m){
 					
-					for (var m:Number = 0; m <= brickM.getBrickCount(); ++m)
-					{
-
 						brickM.removeBrick(m);
 						trace(m);
 						m = 0;
-						
 					}
-					for (var j:Number = 0; j < power.getPowerCount(); ++j)
-					{
+					
+					//remove Bricks (Same Above Mistake)
+					for (var j:Number = 0; j < power.getPowerCount(); ++j){
+					
 						power.removePower(j);
 						//j=0;
 					}
 					
-				
+					//reset level
 					start = false;
 					ball.resetBall();
 					ball.setSpeed(10);
@@ -88,77 +84,60 @@ package {
 					brickM.creatBricks();
 					power.resetPower();
 					
-
 					//reset lives / score
 					liveNum = 3;
 					scoreNum = 0;
 					
+					//reset visual
 					Score.text = scoreNum.toString();
-					Lives.text = liveNum.toString();
-					
-
-					
+					Lives.text = liveNum.toString();					
 				}
 				
-
-				
-				//if true animate ball
-				if (start == true)
-				{
+				//if start game == true then animate ball
+				if (start == true){
 					ball.ballAnimate();	
 					
 				}
 				
 				//ball/pad hittest
-				if (ball.hitTestObject(pad))
-				{
-				ball.ballPadHit(pad.x);
+				if (ball.hitTestObject(pad)){
+					ball.ballPadHit(pad.x);
 				}
 				
-				//loop thro power
-				for (var j:Number = 0; j < power.getPowerCount(); ++j)
-				{
-
-					
-					//call animate Power
+				//loop power created powers (Not sure I would do this...  hindsight I would create Power Manager)
+				for (var j:Number = 0; j < power.getPowerCount(); ++j){
+				
+					//animate Power
 					power.powerAnimate(j);
-
-					
+	
 					//If power Hits Pad
-					if(pad.hitTestObject(power.getPower(j)))
-					{
+					if(pad.hitTestObject(power.getPower(j))){
+					
 						power.removePower(j);
 						
 						//every level the speed doubles
 						ball.setSpeed(ball.getSpeed() + (power.getLevel()*power.getSpeedIn()));
 						power.decPowerCount();
 						j = 0;
-						
 					}
-					//if Power goes off screen remove
-					else if (power.getPower(j).y >= 480)
-					{
+					//if Power goes off screen remove or missed power
+					else if (power.getPower(j).y >= 480){
 						power.removePower(j);
 						
 						power.decPowerCount();
 						j = 0;
 					}
 					
-
-						
 				}
 				
-				//Brick Loop
-				for (var i:Number = 0; i < brickM.getBrickCount(); i++)
-				{
+				//Brick Loop (this should have been handled inside the manager)
+				for (var i:Number = 0; i < brickM.getBrickCount(); i++){
 					
 					//ball/hit Brick
-					if(ball.hitTestObject(brickM.getBrick(i)))
-					{
+					if(ball.hitTestObject(brickM.getBrick(i))){
 						
-						//hit test X
-						if (+(ball.x - brickM.getBrick(i).x) > 16)
-						{
+						//Brick / ball hit test X
+						if (+(ball.x - brickM.getBrick(i).x) > 16){
 							
 							power.creatPower(brickM.getBrick(i).x, brickM.getBrick(i).y);
 							
@@ -168,7 +147,7 @@ package {
 							i = 0;
 						
 						}
-						//hit test Y
+						//Brick / ball hit test Y
 						else
 						{
 							power.creatPower(brickM.getBrick(i).x, brickM.getBrick(i).y);
@@ -184,18 +163,10 @@ package {
 						
 						//Score Text
 						Score.text = scoreNum.toFixed(0);
-			
-						
-						
-
 					}
 				}
 
-			
-				ball.ballWallHit();
-
-	
-				
+				ball.ballWallHit();				
 			}
 			
 			function downKeyboard(key:KeyboardEvent):void 
